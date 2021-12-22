@@ -1,12 +1,16 @@
-import "./App.css";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import React from "react";
+// We import all the components we need in our app
+import Create from "./components/create";
+import Products from "./components/products";
 
-
-
-function App() {
+const App = () => {
   return (
-    <div className="App">
+    <div>
+      <Create />
+      <Products />
     </div>
   );
-}
+};
 
 export default App;
