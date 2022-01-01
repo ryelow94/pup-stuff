@@ -2,7 +2,8 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from "@material-ui/icons";
 import React from "react";
 import { useState } from "react"
 import styled from "styled-components";
-import { sliderItems } from "../data"
+import { sliderItems } from "../data";
+import {mobile} from "../responsive"
 
 const Container = styled.div`
   width: 100%;
@@ -11,6 +12,7 @@ const Container = styled.div`
   background-color: coral;
   position: relative;
   overflow: hidden;
+  ${mobile({display:"none"})};
 `;
 const Arrow = styled.div`
   width: 50px;

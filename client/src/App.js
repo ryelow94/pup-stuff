@@ -5,13 +5,14 @@ import { ProductList } from "./pages/ProductList";
 import  { Product }  from "./pages/Product";
 import { SignUp } from "./pages/SignUp";
 import { LogIn } from "./pages/LogIn";
+import { Cart } from "./pages/Cart";
 
 
 const App = () => {
   return (
     <div> 
-    <SignUp/>
-    <LogIn/>
+      <LogIn/>
+      <SignUp/>
     </div>
    
   );

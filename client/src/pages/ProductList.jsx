@@ -4,10 +4,11 @@ import { Announcement } from "../components/Announcement";
 import { Footer } from "../components/Footer";
 import { Navbar } from "../components/Navbar";
 import { Products } from "../components/Products";
+import { mobile } from "../responsive"
 
 const Container = styled.div``;
 const Title = styled.h1`
-  margin: 20px;
+  margin: 0px;
 `;
 const FilterContainer = styled.div`
   display: flex;
@@ -15,6 +16,7 @@ const FilterContainer = styled.div`
 `;
 const Filter = styled.div`
   margin: 20px;
+  ${mobile({width:"0px 20px", display: "flex", flexDirection:"column"})};
 `;
 const FilterText = styled.span`
   font-size: 20px;
@@ -24,6 +26,7 @@ const FilterText = styled.span`
 const Select = styled.select`
     padding: 10px;
     margin-right: 20px;
+    ${mobile({margin:"10px 0px"})};
 `;
 const Option = styled.option``;
 
@@ -53,7 +56,7 @@ export const ProductList = () => {
           </Select>
         </Filter>
         <Filter>
-          <FilterText>Price</FilterText>
+          <FilterText>Sort:</FilterText>
           <Select>
             <Option selected> Newest </Option>
             <Option>Price (asc)</Option>
