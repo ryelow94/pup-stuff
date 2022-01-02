@@ -50,7 +50,7 @@ export const ProductList = () => {
     <Container>
       <Announcement />
       <Navbar />
-      <Title>Collars</Title>
+      <Title>{category}</Title>
       <FilterContainer>
         <Filter>
           <FilterText>Options:</FilterText>

@@ -5,6 +5,11 @@ import { Announcement } from "../components/Announcement";
 import { Footer } from "../components/Footer";
 import { Navbar } from "../components/Navbar";
 import { mobile } from "../responsive";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState} from "react";
+import { publicRequest } from "../requestMethods"
+import { addProduct } from "../redux/cartRedux"
+import { useDispatch } from "react-redux"
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -60,6 +65,7 @@ const FilterColor = styled.div`
     border-color: black;
     margin:5px; 5px;
     margin-right: 5px;
+    cursor: pointer;
 `;
 const FilterSize = styled.select`
   margin-left: 10px;
@@ -106,41 +112,69 @@ const Button = styled.button`
 `;
 
 export const Product = () => {
+  const location = useLocation();
+  const id = location.pathname.split("/")[2];
+  const [product, setProduct] = useState({});
+  const [ quantity, setQuantity]= useState(1);
+  const [ color, setColor ] = useState("");
+  const [ size, setSize] = useState("small");
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try{
+        const res = await publicRequest.get("/products/find/" + id);
+        setProduct(res.data);
+      }catch{}
+    }
+    getProduct();
+  },[id])
+
+  const handleQuantity = (type) => {
+    if(type === "dec"){
+      quantity > 1 && setQuantity(quantity-1)
+    } else {
+      setQuantity(quantity +1)
+    }
+  }
+  const handleClick = () => {
+    if(color==="" || size===""){
+      alert("please choose a size and color before adding item to the cart")
+    } else {
+   dispatch(addProduct({...product, quantity, color:color, size:size}))
+    }
+  }
   return (
     <Container>
       <Announcement />
       <Navbar />
       <Wrapper>
         <ImgContainer>
-          <Img src="https://www.freeiconspng.com/thumbs/dog-collar/red-leather-dog-collar-belt-images-1.png" />
+          <Img src={product.img} />
         </ImgContainer>
         <InfoContainer>
-          <Title>Collar</Title>
-          <Desc>This is the description of the product</Desc>
-          <Price>$ 20</Price>
+          <Title>{product.title}</Title>
+          <Desc>{product.description}</Desc>
+          <Price>${product.price}</Price>
           <FilterContainer>
             <Filter>
               <FilterTitle>Color</FilterTitle>
-              <FilterColor color="black" />
-              <FilterColor color="white" />
-              <FilterColor color="red" />
+              {product.color?.map((c) =><FilterColor key={c} color={c} onClick={()=>setColor(c)} />)}
             </Filter>
             <Filter>
-              <FilterTitle>
-                <FilterSize>
-                  <FilterSizeOption> Small</FilterSizeOption>
-                  <FilterSizeOption>Large</FilterSizeOption>
+              <FilterTitle>Size</FilterTitle>
+                <FilterSize onChange={(e)=>setSize(e.target.value)}>
+                 {product.size?.map((s)=><FilterSizeOption key={s}>{s}</FilterSizeOption>)}
                 </FilterSize>
-              </FilterTitle>
             </Filter>
           </FilterContainer>
           <AddContainer>
             <AmountContainer>
-              <Remove style={{ cursor: "pointer" }} />
-              <Amount>1</Amount>
-              <Add style={{ cursor: "pointer" }} />
+              <Remove style={{ cursor: "pointer" }} onClick={()=>handleQuantity("dec")} />
+              <Amount>{quantity}</Amount>
+              <Add style={{ cursor: "pointer" }} onClick={()=>handleQuantity("inc")}/>
             </AmountContainer>
-            <Button>ADD TO CART</Button>
+            <Button onClick={()=> handleClick()}>ADD TO CART</Button>
           </AddContainer>
         </InfoContainer>
       </Wrapper>

@@ -6,6 +6,7 @@ import {
 } from "@material-ui/icons";
 import Badge from "@material-ui/core/Badge";
 import {mobile} from "../responsive"
+import { useSelector } from "react-redux"
 
 const Container = styled.div`
   height: 60px;
@@ -66,6 +67,7 @@ const MenuItem = styled.div`
   ${mobile({fontSize:"12px",marginLeft:"10px"})};
 `;
 export const Navbar = () => {
+  const quantity = useSelector(state=>state.cart.quantity)
   return (
     <Container>
       <Wrapper>
@@ -83,7 +85,7 @@ export const Navbar = () => {
           <MenuItem>SIGN UP</MenuItem>
           <MenuItem>LOG IN</MenuItem>
           <MenuItem>
-            <Badge badgeContent={4} color="primary">
+            <Badge badgeContent={quantity} color="primary">
               <ShoppingCartOutlined />
             </Badge>
           </MenuItem>
