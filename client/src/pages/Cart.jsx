@@ -4,7 +4,14 @@ import styled from "styled-components";
 import { Announcement } from "../components/Announcement";
 import { Footer } from "../components/Footer";
 import { Navbar } from "../components/Navbar";
-import { mobile } from "../responsive"
+import { mobile } from "../responsive";
+import { useSelector } from "react-redux";
+import StripeCheckout from "react-stripe-checkout";
+import { useState, useEffect } from "react";
+import { userRequest} from "../requestMethods"
+import { useHistory} from "react-router"
+
+const KEY = process.env.REACT_APP_STRIPE;
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -31,7 +38,7 @@ const TopButton = styled.button`
   color: ${(props) => props.type === "filled" && "white"};
 `;
 const TopTexts = styled.div`
-${mobile({ display: "none" })};
+  ${mobile({ display: "none" })};
 `;
 
 const TopText = styled.span`
@@ -98,7 +105,6 @@ const ProductPrice = styled.div`
   font-size: 30px;
   font-weght: 200;
   ${mobile({ marginBottom: "20px" })};
-
 `;
 const Hr = styled.hr`
   background-color: #eee;
@@ -135,6 +141,24 @@ const SummaryButton = styled.button`
 `;
 
 export const Cart = () => {
+  const cart = useSelector((state) => state.cart);
+  const [stripeToken, setStripeToken] = useState(null);
+  const history = useHistory()
+  const onToken = (token) => {
+    setStripeToken(token);
+  };
+  useEffect(() => {
+    const makeRequest = async () => {
+      try{
+        const res =  await userRequest.post("/checkout/payment", {
+        tokenId:stripeToken.id,
+        amount:cart.total * 100,
+        });
+        history.push("/success", {data:res.data})
+      } catch{}
+    }
+   stripeToken && makeRequest()
+  }, [stripeToken, cart.total, history]);
   return (
     <Container>
       <Announcement />
@@ -151,67 +175,47 @@ export const Cart = () => {
         </Top>
         <Bottom>
           <Info>
-            <Product>
-              <ProductDetails>
-                <Image src="https://media.istockphoto.com/vectors/leash-icon-on-transparent-background-vector-id1282547902?k=20&m=1282547902&s=170667a&w=0&h=G8tSjBlUatalYsyj-IizZlx5WCEfGhqWPsTU_m6NJxQ=" />
-                <Details>
-                  <ProductName>
-                    <b>Product: </b>Leash
-                  </ProductName>
-                  <ProductId>
-                    <b>ID: </b>1234
-                  </ProductId>
-                  <ProductColor color="red" />
-                  <ProductSize>
-                    <b>Size: </b>Small
-                  </ProductSize>
-                </Details>
-              </ProductDetails>
-              <PriceDetails>
-                <ProductAmountContainer>
-                  <Remove />
-                  <ProductAmount>2</ProductAmount>
-                  <Add />
-                </ProductAmountContainer>
-                <ProductPrice> $ 40</ProductPrice>
-              </PriceDetails>
-            </Product>
-            <Hr></Hr>
-            <Product>
-              <ProductDetails>
-                <Image src="https://s.yimg.com/aah/gundog/wig-wag-small-dog-collar-emerald-green-90.jpg" />
-                <Details>
-                  <ProductName>
-                    <b>Product: </b>Collar
-                  </ProductName>
-                  <ProductId>
-                    <b>ID: </b>1243
-                  </ProductId>
-                  <ProductColor color="green" />
-                  <ProductSize>
-                    <b>Size: </b>Small
-                  </ProductSize>
-                </Details>
-              </ProductDetails>
-              <PriceDetails>
-                <ProductAmountContainer>
-                  <Remove />
-                  <ProductAmount>2</ProductAmount>
-                  <Add />
-                </ProductAmountContainer>
-                <ProductPrice> $ 40</ProductPrice>
-              </PriceDetails>
-            </Product>
+            {cart.products.map((product) => (
+              <Product>
+                <ProductDetails>
+                  <Image src={product.img} />
+                  <Details>
+                    <ProductName>
+                      <b>Product: </b>
+                      {product.title}
+                    </ProductName>
+                    <ProductId>
+                      <b>ID: </b>
+                      {product._id}
+                    </ProductId>
+                    <ProductColor color={product.color} />
+                    <ProductSize>
+                      <b>Size: </b>
+                      {product.size}
+                    </ProductSize>
+                  </Details>
+                </ProductDetails>
+                <PriceDetails>
+                  <ProductAmountContainer>
+                    <Remove />
+                    <ProductAmount>{product.quantity}</ProductAmount>
+                    <Add />
+                  </ProductAmountContainer>
+                  <ProductPrice> $ {product.price}</ProductPrice>
+                </PriceDetails>
+              </Product>
+            ))}
+            <Hr />
           </Info>
           <Summary>
             <SummaryTitle>Order Summary: </SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal: </SummaryItemText>
-              <SummaryItemPrice> $ 80</SummaryItemPrice>
+              <SummaryItemPrice> $ {cart.total}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Estimated Shipping: </SummaryItemText>
-              <SummaryItemPrice> $ 10</SummaryItemPrice>
+              <SummaryItemPrice> $ 5.90</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Discount: </SummaryItemText>
@@ -219,9 +223,19 @@ export const Cart = () => {
             </SummaryItem>
             <SummaryItem type="total">
               <SummaryItemText>Total: </SummaryItemText>
-              <SummaryItemPrice> $ 82</SummaryItemPrice>
+              <SummaryItemPrice> $ {cart.total}</SummaryItemPrice>
             </SummaryItem>
-            <SummaryButton>ORDER</SummaryButton>
+            <StripeCheckout
+              name="Pup Stuff"
+              billingAddress
+              shippingAddress
+              description={`Your total is $${cart.total}`}
+              amount={cart.total * 100}
+              token={onToken}
+              stripeKey={KEY}
+            >
+              <SummaryButton>Order Now</SummaryButton>
+            </StripeCheckout>
           </Summary>
         </Bottom>
       </Wrapper>

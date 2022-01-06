@@ -6,7 +6,8 @@ import {
 } from "@material-ui/icons";
 import Badge from "@material-ui/core/Badge";
 import {mobile} from "../responsive"
-import { useSelector } from "react-redux"
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom"
 
 const Container = styled.div`
   height: 60px;
@@ -82,13 +83,19 @@ export const Navbar = () => {
           <Logo>PUP STUFF</Logo>
         </Center>
         <Right>
+          <Link to="/signup">
           <MenuItem>SIGN UP</MenuItem>
+          </Link>
+          <Link to="/login">
           <MenuItem>LOG IN</MenuItem>
+          </Link>
+          <Link to="/cart">
           <MenuItem>
             <Badge badgeContent={quantity} color="primary">
               <ShoppingCartOutlined />
             </Badge>
           </MenuItem>
+          </Link>
         </Right>
       </Wrapper>
     </Container>
