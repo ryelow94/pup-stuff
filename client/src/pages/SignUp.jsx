@@ -1,5 +1,10 @@
 import React from "react";
 import styled from "styled-components";
+import { useState } from "react";
+import { useDispatch } from "react-redux"
+import { useSelector } from "react-redux";
+import { signUp } from "../redux/apiCalls"
+
 
 const Container = styled.div`
   width: 100vw;
@@ -55,21 +60,46 @@ const Button = styled.button`
 `;
 
 export const SignUp = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch()
+  const { isFetching, error} = useSelector((state) => state.user)
+
+  const handleClick = (e) => {
+    e.preventDefault();
+   signUp(dispatch,  {email, password, firstName,lastName})
+  };
   return (
     <Container>
       <Wrapper>
         <Title>SIGN UP</Title>
         <Form>
-          <Input placeholder="First Name" />
-          <Input placeholder="Last Name" />
-          <Input placeholder="Email" />
-          <Input placeholder="Password" />
+          <Input
+            placeholder="First Name"
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <Input
+            placeholder="Last Name"
+            onChange={(e) => setLastName(e.target.value)}
+          />
+          <Input
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
           <Input placeholder="Confirm Password" />
           <Agreement>
             By creating an account, I consent to the use of my personal
             information in accordance with our <b>Privacy Policy</b>
           </Agreement>
-          <Button>Sign Up</Button>
+          <Button onClick={handleClick} disabled={isFetching} >
+            Sign Up
+          </Button>
         </Form>
       </Wrapper>
     </Container>
